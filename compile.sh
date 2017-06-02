@@ -1,1 +1,1 @@
-gcc DecisionTree.h DecisionTree.c Tests.c -ggdb
+gcc *.h *.c -ggdb

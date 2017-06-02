@@ -27,10 +27,26 @@ double CalculateGiniForSet(double** elements, int count, int classes){
 	return result;
 }
 
-double*** Split(double** elements, int elementsCount, int attributesCount, int classCount){
+void TrySplit(int index, int value, double** elements, int elementsCount, double** left, double** right, int* leftCount, int* rightCount){
+	int k;
+	for(k = 0; k < elementsCount; k++){
+		if(elements[k][index] > value){
+			// element is greater, add to right tree
+			right[(*rightCount)] = elements[k];
+			(*rightCount)++;
+		}
+		else{
+			left[(*leftCount)] = elements[k];
+			(*leftCount)++;
+		}						
+	}
+}
+
+void Split(TreeNode* node, double** elements, int elementsCount, int attributesCount, int classCount){
 	double** left, ** right;
 	double*** split = malloc(sizeof(double**) * 2);
 	int bestIndex, 	i, j, k, leftCount, rightCount;
+	double leftGini, rightGini, bestLeftGini, bestRightGini;
 	double bestSplitValue, bestGini = 1.0, currentGini;
 	left = malloc(sizeof(double*)* elementsCount);
 	right = malloc(sizeof(double*)* elementsCount);
@@ -41,22 +57,16 @@ double*** Split(double** elements, int elementsCount, int attributesCount, int c
 				// clear left and right
 				leftCount = rightCount = 0;
 				memset(left, 0, sizeof(double*)*elementsCount);
-				// split objects by value
-				for(k = 0; k < elementsCount; k++){
-					if(elements[k][i] > elements[j][i]){
-						// element is greater, add to right tree
-						right[rightCount] = elements[k];
-						rightCount++;
-					}
-					else{
-						left[leftCount] = elements[k];
-						leftCount++;
-					}						
-				}
+				// split objects by valuec
+				TrySplit(i, elements[j][i], elements, elementsCount, left, right, &leftCount, &rightCount);
 				// calculate global split gini
-				currentGini = CalculateGiniForSet(left, leftCount, classCount) + CalculateGiniForSet(right, rightCount, classCount);
+				leftGini = CalculateGiniForSet(left, leftCount, classCount);
+				rightGini = CalculateGiniForSet(right, rightCount, classCount);
+				currentGini = leftGini + rightGini;
 				if(currentGini < bestGini){
 					bestGini = currentGini;
+					bestLeftGini = leftGini;
+					bestRightGini = rightGini;
 					bestSplitValue = elements[j][i];
 					bestIndex = i;
 				}
@@ -65,18 +75,24 @@ double*** Split(double** elements, int elementsCount, int attributesCount, int c
 	// split using best params
 	rightCount = leftCount = 0;
 	memset(left, 0, sizeof(double*)*elementsCount);	
-	for(k = 0; k < elementsCount; k++){
-		if(elements[k][bestIndex] > bestSplitValue){
-			// element is greater, add to right tree
-			right[rightCount] = elements[k];
-			rightCount++;
-		}
-		else{
-			left[leftCount] = elements[k];
-			leftCount++;
-		}						
+	TrySplit(bestIndex, bestSplitValue, elements, elementsCount, left, right, &leftCount, &rightCount);
+	node->attributeValue = bestSplitValue;
+	node->attributeIndex = bestIndex;
+	node->data = elements;
+	node->left = malloc(sizeof(TreeNode));
+	node->right = malloc(sizeof(TreeNode));
+	// left node
+	if(bestLeftGini > 0){
+		Split(node->left, left, leftCount, attributesCount, classCount); 
 	}
-	split[0] = left;
-	split[1] = right;
-	return split;
+	else{
+		node->left->data = left;
+	}
+	// right node
+	if(bestRightGini > 0){
+		Split(node->right, right, leftCount, attributesCount, classCount); 
+	}
+	else{
+		node-> right->data = right;
+	}
 }
