@@ -1,0 +1,4 @@
+*.o
+DecisionTree
+*.out
+*.gch
