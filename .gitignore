@@ -2,3 +2,5 @@
 DecisionTree
 *.out
 *.gch
+*.so
+*.a

@@ -64,7 +64,7 @@ void Split(TreeNode* node, double** elements, int elementsCount, int attributesC
 	//DisplayArray(elements, elementsCount, attributesCount);
 	#endif
 	double** left, ** right;
-	int bestIndex, 	i, j, k, leftCount, rightCount;
+	int bestIndex, 	i, j,	 leftCount, rightCount;
 	double leftGini, rightGini, bestLeftGini, bestRightGini;
 	double bestSplitValue, bestGini = 1.0, currentGini;
 	left = malloc(sizeof(double*)* elementsCount);
