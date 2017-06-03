@@ -44,7 +44,6 @@ void TrySplit(int index, int value, double** elements, int elementsCount, double
 
 void Split(TreeNode* node, double** elements, int elementsCount, int attributesCount, int classCount){
 	double** left, ** right;
-	double*** split = malloc(sizeof(double**) * 2);
 	int bestIndex, 	i, j, k, leftCount, rightCount;
 	double leftGini, rightGini, bestLeftGini, bestRightGini;
 	double bestSplitValue, bestGini = 1.0, currentGini;
@@ -86,6 +85,7 @@ void Split(TreeNode* node, double** elements, int elementsCount, int attributesC
 		Split(node->left, left, leftCount, attributesCount, classCount); 
 	}
 	else{
+		// no recurrency will be triggered so save the result
 		node->left->data = left;
 	}
 	// right node
@@ -93,6 +93,16 @@ void Split(TreeNode* node, double** elements, int elementsCount, int attributesC
 		Split(node->right, right, leftCount, attributesCount, classCount); 
 	}
 	else{
+		// no recurrency will be triggered so save the result
 		node-> right->data = right;
 	}
 }
+
+void DisposeTree(TreeNode* node){
+	if(node == NULL) return;
+	DisposeTree(node->left);
+	DisposeTree(node->right);
+	free(node->data);
+	free(node);
+}
+
