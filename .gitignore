@@ -4,3 +4,5 @@ DecisionTree
 *.gch
 *.so
 *.a
+/DecisionTreeLib/dist/
+/DecisionTreeLib/build/
